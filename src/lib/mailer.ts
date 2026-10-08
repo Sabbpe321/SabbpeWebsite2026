@@ -4,11 +4,13 @@
  */
 export async function sendVerificationEmail(to: string, link: string): Promise<void> {
   if (!process.env.SMTP_HOST) { console.log(`[signup] verification link for ${to}: ${link}`); return; }
+  const from = process.env.MAIL_FROM;
+  if (!from) throw new Error('MAIL_FROM must be set in the environment to send the verification email');
   const nodemailer = (await import('nodemailer')).default;
   const port = Number(process.env.SMTP_PORT ?? 587);
   const transport = nodemailer.createTransport({ host: process.env.SMTP_HOST, port, secure: port === 465, auth: process.env.SMTP_USER ? { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS } : undefined });
   await transport.sendMail({
-    from: process.env.MAIL_FROM ?? 'SabbPe <no-reply@sabbpe.com>',
+    from,
     to,
     subject: 'Confirm your email for SabbPe developer docs',
     text: `Welcome to SabbPe.\n\nConfirm your email to finish creating your developer account:\n${link}\n\nThis link works for 24 hours. If you did not sign up, you can ignore this email.`,
