@@ -5,7 +5,7 @@ import { Check, Copy } from 'lucide-react';
 import clsx from 'clsx';
 
 type Field = { name: string; type: string; example: string; desc: string };
-export type Endpoint = { id: string; title: string; method: string; path: string; summary: string; headers: { name: string; value: string }[]; examples: { label: string; body: string }[]; fields: Field[]; response: string | null; notes: string[] };
+export type Endpoint = { id: string; title: string; method: string; path: string; summary: string; headers: { name: string; value: string }[]; examples: { label: string; body: string }[]; fields: Field[]; response: string | null; failure?: string | null; errors?: { message: string; cause: string }[]; notes: string[] };
 
 const LANGS = ['cURL', 'Node.js', 'Python'] as const;
 type Lang = (typeof LANGS)[number];
@@ -46,6 +46,7 @@ function CodePanel({ title, code, right }: { title: string; code: string; right?
 export default function EndpointBlock({ endpoint, baseUrl }: { endpoint: Endpoint; baseUrl: string }) {
   const [lang, setLang] = useState<Lang>('cURL');
   const [ex, setEx] = useState(0);
+  const [res, setRes] = useState<'ok' | 'fail'>('ok');
   const body = endpoint.examples[ex]?.body ?? '';
   const url = `${baseUrl}${endpoint.path}`;
   return (
@@ -76,6 +77,16 @@ export default function EndpointBlock({ endpoint, baseUrl }: { endpoint: Endpoin
             </div>
           </>)}
 
+          {endpoint.errors && endpoint.errors.length > 0 && (<>
+            <h4 className="mt-6 text-[13px] font-semibold uppercase tracking-[0.1em] text-[#64748B]">Error messages</h4>
+            <div className="mt-2 overflow-x-auto rounded-lg border border-slate-200">
+              <table className="w-full text-left text-[13px]">
+                <thead className="bg-[#F8FAFC] text-[#64748B]"><tr><th className="px-3 py-2 font-semibold">Message</th><th className="px-3 py-2 font-semibold">Cause</th></tr></thead>
+                <tbody>{endpoint.errors.map((e) => (<tr key={e.message} className="border-t border-slate-100 align-top"><td className="px-3 py-2 font-mono text-[#0F172A]">{e.message}</td><td className="px-3 py-2 text-[#475569]">{e.cause}</td></tr>))}</tbody>
+              </table>
+            </div>
+          </>)}
+
           {endpoint.notes.length > 0 && (<ul className="mt-6 space-y-2">{endpoint.notes.map((n) => (<li key={n} className="rounded-lg border border-[#BFDBFE] bg-[#EFF6FF] px-3 py-2 text-[13px] leading-relaxed text-[#1E3A8A]">{n}</li>))}</ul>)}
         </div>
 
@@ -88,7 +99,8 @@ export default function EndpointBlock({ endpoint, baseUrl }: { endpoint: Endpoin
           <CodePanel title="Request" code={sample(lang, endpoint.method, url, endpoint.headers, body)}
             right={<div className="flex rounded-md bg-white/5 p-0.5" role="tablist" aria-label="Language">{LANGS.map((l) => (<button key={l} type="button" role="tab" aria-selected={l === lang} onClick={() => setLang(l)} className={clsx('rounded px-2 py-1 text-[12px] font-medium', l === lang ? 'bg-white text-[#0B1220]' : 'text-[#CBD5E1] hover:text-white')}>{l}</button>))}</div>} />
           {endpoint.response
-            ? <CodePanel title="Response" code={endpoint.response} />
+            ? <CodePanel title="Response" code={res === 'fail' && endpoint.failure ? endpoint.failure : endpoint.response}
+                right={endpoint.failure ? <div className="flex rounded-md bg-white/5 p-0.5" role="tablist" aria-label="Response example">{([['ok', 'Success'], ['fail', 'Failure']] as const).map(([k, l]) => (<button key={k} type="button" role="tab" aria-selected={res === k} onClick={() => setRes(k)} className={clsx('rounded px-2 py-1 text-[12px] font-medium', res === k ? 'bg-white text-[#0B1220]' : 'text-[#CBD5E1] hover:text-white')}>{l}</button>))}</div> : undefined} />
             : <div className="rounded-xl border border-dashed border-slate-300 bg-[#F8FAFC] px-4 py-3 text-[13px] text-[#64748B]">A sample response for this call has not been published yet.</div>}
         </div>
       </div>
