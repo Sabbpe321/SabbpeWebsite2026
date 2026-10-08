@@ -2,6 +2,7 @@ import Navbar from '@/components/navigation/Navbar';
 import Footer from '@/components/premium/Footer';
 import AskSabbPe from './AskSabbPe';
 import GoLiveCurve from './GoLiveCurve';
+import OnboardingStory from './OnboardingStory';
 import Hero from './Hero';
 import PaymentFlow from './PaymentFlow';
 import ProductsIndex from './ProductsIndex';
@@ -18,6 +19,7 @@ export default function RedesignHomePage() {
       <TechStackShowcase />
       <PaymentFlow />
       <GoLiveCurve />
+      <OnboardingStory />
       <StatsCard />
       <ProductsIndex />
       <AskSabbPe />

@@ -201,6 +201,51 @@ const SERVICE_CATEGORIES: ServiceCategory[] = [
       },
     ],
   },
+  {
+    id: 'settlement-operations',
+    title: 'Settlement and operations',
+    subtitle: 'Settlement, reconciliation and dashboards',
+    icon: FileCheck2,
+    color: '#0F766E',
+    features: [
+      {
+        id: 'settlement',
+        name: 'Settlement',
+        tagline: 'Automatic settlement on your timeline',
+        desc: 'Share your bank account once at onboarding and choose T+0 or T+1. A SabbPe agent settles on schedule, and every settlement shows in your dashboard.',
+        videoSrc: '/videos/settlement.mp4',
+        posterSrc: '/videos/settlement.jpg',
+        icon: Zap,
+      },
+      {
+        id: 'reconciliation',
+        name: 'Reconciliation',
+        tagline: 'Every record matched by an agent',
+        desc: 'Drop in your orders, gateway payments and bank settlements. An agent matches every record, shows what is missing and lets you trace any ID.',
+        videoSrc: '/videos/reconciliation.mp4',
+        posterSrc: '/videos/reconciliation.jpg',
+        icon: FileCheck2,
+      },
+      {
+        id: 'merchant-dashboard',
+        name: 'Merchant Dashboard',
+        tagline: 'Run your payments from one place',
+        desc: 'For businesses that accept payments. Choose products, collect payments, track every transaction and send payouts.',
+        videoSrc: '/videos/merchant_dashboard.mp4',
+        posterSrc: '/videos/merchant_dashboard.jpg',
+        icon: Activity,
+      },
+      {
+        id: 'distributor-dashboard',
+        name: 'Distributor Dashboard',
+        tagline: 'Onboard merchants and track earnings',
+        desc: 'For partners who bring merchants to SabbPe. Onboard merchants, track their approval and see your earnings and settlements.',
+        videoSrc: '/videos/distributor_dashboard.mp4',
+        posterSrc: '/videos/distributor_dashboard.jpg',
+        icon: Users,
+      },
+    ],
+  },
 ];
 
 function resolveCategoryIndex(slug?: string): number {

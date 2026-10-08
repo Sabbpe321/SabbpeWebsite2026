@@ -18,6 +18,31 @@ export type DocsGroup = { title: string; products: DocsProduct[] };
 
 export const DOCS_GROUPS: DocsGroup[] = [
   {
+    title: 'Onboarding and operations',
+    products: [
+      { slug: 'merchant-onboarding', name: 'Merchant Onboarding', tagline: 'Onboard in minutes, not days.', access: 'dashboard', video: '/videos/merchant_onboarding.mp4',
+        narration: 'Six agents take a merchant from the first hello to a signed agreement: a guide, document reading, identity checks, business checks, clear pricing, and signing.',
+        whoFor: ['New merchants', 'Distributors onboarding merchants'],
+        steps: ['A guide helps you choose products', 'Documents are read automatically', 'Identity is confirmed by video', 'The agreement is signed and you go live'] },
+      { slug: 'settlement', name: 'Settlement', tagline: 'Automatic settlement on your timeline.', access: 'dashboard', video: '/videos/settlement.mp4',
+        narration: 'Share your bank account once at onboarding and choose your settlement timeline. A SabbPe agent settles on schedule, and every settlement shows in your dashboard.',
+        whoFor: ['Merchants', 'Finance teams', 'Distributors'],
+        steps: ['Share your bank account at onboarding', 'Choose T+0 or T+1', 'A SabbPe agent settles on schedule', 'Track every settlement'] },
+      { slug: 'reconciliation', name: 'Reconciliation', tagline: 'Every record matched by an agent.', access: 'dashboard', video: '/videos/reconciliation.mp4',
+        narration: 'Upload your orders, gateway payments and bank settlements. An agent matches every record, shows what is still missing and lets you trace any ID across the files.',
+        whoFor: ['Finance teams', 'High-volume sellers', 'Accountants'],
+        steps: ['Drop in your files', 'The agent matches every record', 'See what matched and what is missing', 'Trace any ID, then download'] },
+      { slug: 'merchant-dashboard', name: 'Merchant Dashboard', tagline: 'Run your payments from one place.', access: 'dashboard', video: '/videos/merchant_dashboard.mp4',
+        narration: 'A merchant is a business that accepts payments through SabbPe. The merchant dashboard is where they choose products, collect payments, track transactions and send payouts.',
+        whoFor: ['Shops and online stores', 'Service providers'],
+        steps: ['Choose your products', 'Collect a payment', 'Track every transaction', 'Send payouts'] },
+      { slug: 'distributor-dashboard', name: 'Distributor Dashboard', tagline: 'Onboard merchants and track earnings.', access: 'dashboard', video: '/videos/distributor_dashboard.mp4',
+        narration: 'A distributor is a partner who brings merchants to SabbPe and earns commission. The distributor dashboard is where they onboard merchants, track approvals and see their earnings.',
+        whoFor: ['Channel partners', 'Resellers with a merchant network'],
+        steps: ['Get your distributor account', 'Onboard your merchants', 'Track your merchants', 'See your earnings'] },
+    ],
+  },
+  {
     title: 'Online payments',
     products: [
       { slug: 'checkout-page', name: 'Checkout Page', tagline: 'Take payments on your website or app.', access: 'api', video: '/videos/checkout_page.mp4',

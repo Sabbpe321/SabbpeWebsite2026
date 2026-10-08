@@ -24,6 +24,7 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import { Wrap, FOCUS } from './ui';
+import OpsDemoSection from './OpsDemoSection';
 import { SaasModule, SAAS_MODULES } from '@/app/saas/saasData';
 
 export default function SaasProductDetail({ slug, item: propItem }: { slug: string; item?: SaasModule }) {
@@ -151,6 +152,9 @@ export default function SaasProductDetail({ slug, item: propItem }: { slug: stri
             </div>
           </Wrap>
         </section>
+
+        {/* Demo video and narrative */}
+        <OpsDemoSection slug={cleanSlug} />
 
         {/* Interactive Live Showcase Section */}
         <section className="py-16">
