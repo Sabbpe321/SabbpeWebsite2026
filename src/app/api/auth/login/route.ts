@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { SESSION_COOKIE, SESSION_HOURS, createSessionValue } from '@/lib/docsAuth';
-import { getStore } from '@/lib/devStore';
+import { ensureUatCredentials, getStore } from '@/lib/devStore';
 import { checkPassword, clientIp, tooMany } from '@/lib/authUtil';
 
 export async function POST(req: Request) {
@@ -16,6 +16,8 @@ export async function POST(req: Request) {
     // Only confirmed accounts exist in `developers`, so a match here is always a finished sign-up.
     if (!dev || !(await checkPassword(password, dev.passwordHash))) return NextResponse.json({ ok: false, message: 'That email and password do not match an account.' }, { status: 401 });
     await store.touchLogin(dev.id);
+    // First login for a developer: give them the default UAT credentials (never overwrites their own).
+    await ensureUatCredentials(dev.id);
     const response = NextResponse.json({ ok: true });
     response.cookies.set(SESSION_COOKIE, createSessionValue(dev.email), { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', path: '/', maxAge: SESSION_HOURS * 3600 });
     return response;

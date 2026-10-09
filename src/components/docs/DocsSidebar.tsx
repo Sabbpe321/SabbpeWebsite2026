@@ -7,7 +7,7 @@ import { ChevronDown, Lock, BookOpen } from 'lucide-react';
 import clsx from 'clsx';
 import { DOCS_GROUPS } from '@/app/docs/docsNav';
 
-export default function DocsSidebar() {
+export default function DocsSidebar({ showUat = false }: { showUat?: boolean }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const item = (href: string, label: string, locked = false) => {
@@ -24,6 +24,12 @@ export default function DocsSidebar() {
   const tree = (
     <nav aria-label="Developer docs" className="space-y-6">
       <div>{item('/docs', 'Introduction')}</div>
+      {showUat && (
+        <div>
+          <p className="px-3 pb-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#64748B]">UAT</p>
+          <div className="space-y-0.5">{item('/docs/uat', 'Credentials')}</div>
+        </div>
+      )}
       {DOCS_GROUPS.map((g) => (
         <div key={g.title}>
           <p className="px-3 pb-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#64748B]">{g.title}</p>

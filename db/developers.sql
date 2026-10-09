@@ -22,5 +22,6 @@ create table if not exists developers (
   verified_at           datetime     null,                   -- set when the email link is opened
   created_at            datetime     not null default current_timestamp,
   last_login_at         datetime     null,
+  uat_credentials       json         null,                   -- per-developer UAT credentials (see the docs /docs/uat)
   unique key developers_email_uniq (email)
 ) engine=InnoDB default charset=utf8mb4;

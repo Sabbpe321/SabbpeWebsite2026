@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getStore } from '@/lib/devStore';
+import { ensureUatCredentials, getStore } from '@/lib/devStore';
 import { SESSION_COOKIE, SESSION_HOURS, createSessionValue } from '@/lib/docsAuth';
 import { clientIp, hashPassword, hashToken, tooMany } from '@/lib/authUtil';
 
@@ -17,6 +17,8 @@ export async function POST(req: Request) {
     if (!pending) return NextResponse.json({ ok: false, message: 'This link is invalid or has expired. Sign up again to get a new one.' }, { status: 400 });
     const dev = await store.promotePending(pending.id, await hashPassword(password));
     if (!dev) return NextResponse.json({ ok: false, message: 'This link is invalid or has expired. Sign up again to get a new one.' }, { status: 400 });
+    // New account: give them the default UAT credentials straight away.
+    await ensureUatCredentials(dev.id);
     const response = NextResponse.json({ ok: true });
     response.cookies.set(SESSION_COOKIE, createSessionValue(dev.email), { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', path: '/', maxAge: SESSION_HOURS * 3600 });
     return response;

@@ -44,10 +44,14 @@ function poolConfig(): import('mariadb').PoolConfig {
   };
 }
 
-async function mariaStore(): Promise<DevStore> {
+async function getPool(): Promise<import('mariadb').Pool> {
   const g = globalThis as unknown as { __sabbpePool?: import('mariadb').Pool };
   if (!g.__sabbpePool) { const { createPool } = await import('mariadb'); g.__sabbpePool = createPool(poolConfig()); }
-  const pool = g.__sabbpePool;
+  return g.__sabbpePool;
+}
+
+async function mariaStore(): Promise<DevStore> {
+  const pool = await getPool();
   const cols = 'id, email, password_hash, name, verified_at';
   return {
     async findByEmail(email) { const rows = (await pool.query(`select ${cols} from developers where email = ?`, [email])) as Row[]; return rows[0] ? fromRow(rows[0]) : null; },
@@ -131,4 +135,81 @@ export async function getStore(): Promise<DevStore> {
   if (process.env.DATABASE_URL) return mariaStore();
   if (process.env.NODE_ENV === 'production' && process.env.DEV_ALLOW_FILE_STORE !== 'true') throw new Error('DATABASE_URL must be set in production');
   return fileStore();
+}
+
+/**
+ * UAT test credentials for the logged-in developer, read from `developers.uat_credentials`.
+ * The JSON holds one object per product, each a map of field name to value.
+ */
+export type UatField = { name: string; value: string };
+export type UatSection = { key: string; title: string; fields: UatField[] };
+
+const UAT_COLUMNS = [
+  { key: 'upideeplinkcredentials', title: 'UPI Deeplink' },
+  { key: 'enach_mandates', title: 'eNACH Mandates' },
+  { key: 'upi_autopay', title: 'UPI AutoPay' },
+  { key: 'checkout_page', title: 'Checkout Page' },
+  { key: 'pay_by_link', title: 'Pay By Link' },
+  { key: 'payouts', title: 'Payouts' },
+] as const;
+
+function uatFields(value: unknown): UatField[] {
+  let obj: unknown = value;
+  if (typeof obj === 'string') { try { obj = JSON.parse(obj); } catch { return []; } }
+  if (!obj || typeof obj !== 'object' || Array.isArray(obj)) return [];
+  return Object.entries(obj as Record<string, unknown>).map(([name, v]) => ({ name, value: v == null ? '' : String(v) }));
+}
+
+/** Default UAT credentials handed to a developer the first time they log in. */
+const DEFAULT_UAT_CREDENTIALS = {
+  upideeplinkcredentials: { sabbpe_merchantid: 'SBPBLmer01', sabbpe_password: 'Testuat@12321' },
+  enach_mandates: { sabbpe_userid: 'SBlonac1409', sabbpe_merchantid: 'SBPBLmer01', sabbpe_password: '9999XPzomtu3rQTL' },
+  upi_autopay: { sabbpe_userid: 'SBlonac1409', sabbpe_merchantid: 'SBPBLmer01', sabbpe_password: '9999XPzomtu3rQTL' },
+  checkout_page: { sabbpe_userid: 'SBlopblmer01', sabbpe_merchantid: 'SBPBLmer01', sabbpe_password: 'PBLmer01@123456' },
+  pay_by_link: { sabbpe_userid: 'SBlopblmer01', sabbpe_merchantid: 'SBPBLmer01', sabbpe_password: 'PBLmer01@123456' },
+  payouts: { merchantId: 'SBPBLmer01', merchantPassword: 'Test@999999' },
+};
+
+/**
+ * Gives the default UAT credentials to a developer whose column is still null.
+ * A developer who has their own value (updated in the DB) is left untouched.
+ */
+export async function ensureUatCredentials(developerId: string): Promise<void> {
+  if (!process.env.DATABASE_URL) return;
+  try {
+    const pool = await getPool();
+    await pool.query('update developers set uat_credentials = ? where id = ? and uat_credentials is null', [JSON.stringify(DEFAULT_UAT_CREDENTIALS), developerId]);
+  } catch (e) {
+    console.error('[uat] seed failed', e);
+  }
+}
+
+/** True if the developer has any UAT credentials. Never selects or returns the values. */
+export async function hasUatCredentials(email: string): Promise<boolean> {
+  if (!process.env.DATABASE_URL) return false;
+  try {
+    const pool = await getPool();
+    const rows = (await pool.query('select (uat_credentials is not null) as has from developers where email = ?', [email])) as { has?: number | boolean }[];
+    return Boolean(rows[0]?.has);
+  } catch (e) {
+    console.error('[uat] failed', e);
+    return false;
+  }
+}
+
+export async function getUatCredentials(email: string): Promise<UatSection[]> {
+  if (!process.env.DATABASE_URL) return [];
+  try {
+    const pool = await getPool();
+    const rows = (await pool.query('select uat_credentials from developers where email = ?', [email])) as { uat_credentials?: unknown }[];
+    let obj: unknown = rows[0]?.uat_credentials;
+    if (!obj) return [];
+    if (typeof obj === 'string') { try { obj = JSON.parse(obj); } catch { return []; } }
+    if (typeof obj !== 'object' || obj === null || Array.isArray(obj)) return [];
+    const rec = obj as Record<string, unknown>;
+    return UAT_COLUMNS.map((c) => ({ key: c.key, title: c.title, fields: uatFields(rec[c.key]) })).filter((s) => s.fields.length > 0);
+  } catch (e) {
+    console.error('[uat] failed', e);
+    return [];
+  }
 }
