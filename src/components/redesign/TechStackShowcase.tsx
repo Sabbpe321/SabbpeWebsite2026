@@ -33,7 +33,7 @@ const CORE_PILLARS = [
 // Homepage video.
 // Set a Google Drive file ID to play that video in Drive's player. The file must be shared as
 // "Anyone with the link", or visitors will see a Google access message.
-// Set this to null to play the self-hosted file at /tech_stack_video.mp4 instead (autoplay, loop, custom controls).
+// Set this to null to play the self-hosted file at /sabbpe_final_video_v2.mp4 instead (autoplay, loop, custom controls).
 const HOMEPAGE_VIDEO_DRIVE_ID: string | null = null;
 
 const ARCHITECTURE_FEATURES = [
@@ -63,7 +63,7 @@ const ARCHITECTURE_FEATURES = [
   },
 ];
 
-const VIDEO_TOTAL_SECONDS = 40; // Exact length of tech_stack_video.mp4 (0:40)
+const VIDEO_TOTAL_SECONDS = 103; // Exact length of sabbpe_final_video_v2.mp4 (1:43)
 
 export default function TechStackShowcase() {
   const [isPlaying, setIsPlaying] = useState(true);
@@ -107,7 +107,7 @@ export default function TechStackShowcase() {
 
   const formatTime = (timeInSeconds: number, isTotalDuration = false) => {
     if (isNaN(timeInSeconds) || !isFinite(timeInSeconds) || timeInSeconds <= 0) {
-      return isTotalDuration ? '0:40' : '0:00';
+      return isTotalDuration ? '1:43' : '0:00';
     }
     const minutes = Math.floor(timeInSeconds / 60);
     const seconds = Math.floor(timeInSeconds % 60);
@@ -288,7 +288,7 @@ export default function TechStackShowcase() {
             ) : !videoError ? (
               <video
                 ref={videoRef}
-                src="/tech_stack_video.mp4#t=1"
+                src="/sabbpe_final_video_v2.mp4#t=1"
                 autoPlay
                 loop
                 muted={isMuted}
@@ -512,7 +512,7 @@ export default function TechStackShowcase() {
                 <input
                   type="range"
                   min={0}
-                  max={duration || 40}
+                  max={duration || VIDEO_TOTAL_SECONDS}
                   step={0.1}
                   value={currentTime}
                   onChange={handleSeekChange}
