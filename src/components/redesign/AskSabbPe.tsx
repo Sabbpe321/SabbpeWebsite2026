@@ -62,21 +62,31 @@ export default function AskSabbPe() {
   };
 
   return (
-    <section className="border-t border-slate-100 bg-white py-24">
+    <section className="border-t border-slate-100 bg-white py-12 sm:py-14">
       <Wrap>
-        <div className="flex flex-col gap-9 text-[#0F172A]">
-          <div className="flex flex-col items-center gap-4 text-center">
+        <div className="flex flex-col gap-7 text-[#0F172A]">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            className="flex flex-col items-center gap-4 text-center"
+          >
             <Chip>SabbPe AI</Chip>
             <h2 className={clsx(H2, 'max-w-[720px] text-[#0F172A]')}>
               Ask anything. <span className="text-[#0457F1]">SabbPe AI</span> already knows your payments.
             </h2>
-          </div>
+          </motion.div>
 
           <div ref={ref} className="grid gap-6 lg:grid-cols-[minmax(0,380px)_minmax(0,1fr)]">
             <div className="flex flex-col gap-2.5">
               {QUESTIONS.map((question, index) => (
-                <button
+                <motion.button
                   key={question.text}
+                  initial={{ opacity: 0, x: -15 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true, amount: 0.15 }}
+                  transition={{ duration: 0.45, delay: index * 0.08, ease: [0.16, 1, 0.3, 1] }}
                   type="button"
                   aria-pressed={index === active}
                   onClick={() => pick(index)}
@@ -99,11 +109,17 @@ export default function AskSabbPe() {
                       aria-hidden="true"
                     />
                   )}
-                </button>
+                </motion.button>
               ))}
             </div>
 
-            <div className="flex min-h-[360px] flex-col gap-4 rounded-2xl border border-slate-200 bg-[#F8FAFC] p-6 shadow-sm sm:p-7">
+            <motion.div
+              initial={{ opacity: 0, x: 15 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, amount: 0.15 }}
+              transition={{ duration: 0.55, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+              className="flex min-h-[360px] flex-col gap-4 rounded-2xl border border-slate-200 bg-[#F8FAFC] p-6 shadow-sm sm:p-7"
+            >
               <div className="max-w-[85%] self-end rounded-xl border border-blue-200 bg-white px-4 py-3 text-sm font-semibold text-[#0F172A] shadow-2xs">
                 {QUESTIONS[active].text}
               </div>
@@ -118,7 +134,7 @@ export default function AskSabbPe() {
                   <ArrowUp className="h-4 w-4" />
                 </span>
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
       </Wrap>

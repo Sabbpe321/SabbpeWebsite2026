@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { motion, AnimatePresence, useInView, useReducedMotion } from 'framer-motion';
 import clsx from 'clsx';
 import {
@@ -13,11 +13,13 @@ import {
   FileCheck2,
   Clock,
   Check,
+  Play,
+  X,
 } from 'lucide-react';
 import { Chip, FOCUS, H2, Wrap } from './ui';
 import { useAutoStep } from './hooks';
 
-const STEP_DURATION_MS = 4000;
+const STEP_DURATION_MS = 2000;
 
 const MILESTONES = [
   {
@@ -86,6 +88,29 @@ const MILESTONES = [
   },
 ];
 
+const REASONS = [
+  {
+    why: 'Complex documentation',
+    detail: 'Multiple forms, unclear requirements, repeated submissions.',
+    fix: 'Documents are read automatically. Upload a PAN or Aadhaar and the fields fill themselves.',
+  },
+  {
+    why: 'Lengthy process',
+    detail: 'Days of back-and-forth and lost momentum.',
+    fix: 'Identity is confirmed in real time by a short selfie video.',
+  },
+  {
+    why: 'Poor communication',
+    detail: 'No status updates and unclear next steps.',
+    fix: 'The merchant sees the status at every stage on their own dashboard.',
+  },
+  {
+    why: 'Technical barriers',
+    detail: 'No guidance and no hand-holding.',
+    fix: 'Sahil, the SabbPe guide, walks them through each step.',
+  },
+];
+
 const W = 1000;
 const H = 380;
 const curveY = (t: number) => 340 - 290 * t * t;
@@ -96,7 +121,21 @@ export default function GoLiveCurve() {
   const reduce = useReducedMotion();
   const [touched, setTouched] = useState(false);
   const [active, setActive] = useAutoStep(MILESTONES.length, STEP_DURATION_MS, inView && !touched && !reduce);
+  const [videoOpen, setVideoOpen] = useState(false);
   const current = MILESTONES[active];
+
+  useEffect(() => {
+    if (!videoOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setVideoOpen(false);
+    };
+    document.addEventListener('keydown', onKey);
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = '';
+    };
+  }, [videoOpen]);
 
   // SVG Curve path points and area fill polygon
   const { path, areaPath } = useMemo(() => {
@@ -120,30 +159,44 @@ export default function GoLiveCurve() {
   const activeY = curveY(current.at);
 
   return (
-    <section className="relative overflow-hidden border-t border-slate-100 bg-gradient-to-b from-[#F8FAFC] via-[#F1F5F9]/30 to-white py-24 text-[#0F172A]">
+    <section className="relative overflow-hidden border-t border-slate-100 bg-gradient-to-b from-[#F8FAFC] via-[#F1F5F9]/30 to-white py-12 sm:py-16 text-[#0F172A]">
       {/* Dynamic Background Ambient Blobs */}
       <div className="pointer-events-none absolute -top-40 left-1/4 h-[520px] w-[600px] rounded-full bg-blue-100/40 blur-[100px]" aria-hidden="true" />
       <div className="pointer-events-none absolute top-1/2 right-10 h-[400px] w-[400px] rounded-full bg-sky-100/30 blur-[90px]" aria-hidden="true" />
 
       <Wrap className="relative">
-        <div ref={ref} className="flex flex-col gap-12">
+        <div ref={ref} className="flex flex-col gap-10">
           {/* Section Header */}
-          <div className="flex flex-col items-center gap-4 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            className="flex flex-col items-center gap-3 text-center"
+          >
             <div className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50/80 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-[#0457F1] shadow-2xs backdrop-blur-xs">
               <Sparkles className="h-3.5 w-3.5 text-[#0457F1]" />
-              SabbPe Onboarding Velocity
+              Merchant Onboarding Velocity
             </div>
-            <h2 className={clsx(H2, 'max-w-[780px] text-[#0F172A]')}>
-              Your business, <span className="bg-gradient-to-r from-[#0457F1] via-[#0284C7] to-[#00A3FF] bg-clip-text text-transparent">live in days, not months.</span>
+            <h2 className={clsx(H2, 'max-w-[820px] text-[#0F172A]')}>
+              Onboard in minutes, not days.{' '}
+              <span className="bg-gradient-to-r from-[#0457F1] via-[#0284C7] to-[#00A3FF] bg-clip-text text-transparent">
+                Live in 48 hours.
+              </span>
             </h2>
-            <p className="max-w-[640px] text-base leading-relaxed text-[#475569]">
-              Experience automated onboarding with zero branch visits. Track your real-time trajectory from application to live transaction processing.
+            <p className="max-w-[680px] text-base leading-relaxed text-[#475569]">
+              Most merchants who start onboarding never finish it. SabbPe eliminates physical paperwork, validates KYC in real-time, and guides you directly from application to live transaction processing.
             </p>
-          </div>
+          </motion.div>
 
-          {/* Master Interactive Container */}
-          <div className="relative overflow-hidden rounded-3xl border border-slate-200/90 bg-white/95 p-6 shadow-[0_20px_60px_-15px_rgba(15,23,42,0.07)] backdrop-blur-xl sm:p-10">
-            
+          {/* Master Unified Container */}
+          <motion.div
+            initial={{ opacity: 0, y: 25 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.12 }}
+            transition={{ duration: 0.6, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+            className="relative overflow-hidden rounded-3xl border border-slate-200/90 bg-white/95 p-6 shadow-[0_20px_60px_-15px_rgba(15,23,42,0.07)] backdrop-blur-xl sm:p-10"
+          >
             {/* Top 4 Step Cards Grid */}
             <div className="relative grid grid-cols-2 gap-3.5 sm:grid-cols-4 pb-8 border-b border-slate-100">
               {MILESTONES.map((item, index) => {
@@ -246,7 +299,7 @@ export default function GoLiveCurve() {
             </div>
 
             {/* Split Content: Animated Details (Left) + The Signature Curve Graph (Right) */}
-            <div className="grid items-center gap-10 pt-8 lg:grid-cols-12">
+            <div className="grid items-center gap-10 py-8 lg:grid-cols-12 border-b border-slate-100">
               {/* Left Details Panel */}
               <div className="flex flex-col gap-6 lg:col-span-5">
                 <AnimatePresence mode="wait">
@@ -351,7 +404,7 @@ export default function GoLiveCurve() {
                           y="0"
                           height={H}
                           animate={{ width: progressFraction * W + 14 }}
-                          transition={{ duration: 0.7, ease: [0.25, 1, 0.5, 1] }}
+                          transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
                         />
                       </clipPath>
                     </defs>
@@ -375,11 +428,11 @@ export default function GoLiveCurve() {
                       d={path}
                       fill="none"
                       stroke="url(#curveGradient)"
-                      strokeWidth="4.5"
+                      strokeWidth="5"
                       strokeLinecap="round"
                       initial={{ pathLength: 0.05 }}
                       animate={{ pathLength: progressFraction === 0 ? 0.05 : progressFraction }}
-                      transition={{ duration: 0.7, ease: [0.25, 1, 0.5, 1] }}
+                      transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
                     />
 
                     {/* Animated Streaming Energy Pulse along Active Path */}
@@ -388,25 +441,26 @@ export default function GoLiveCurve() {
                         d={path}
                         fill="none"
                         stroke="#FFFFFF"
-                        strokeWidth="2"
+                        strokeWidth="2.5"
                         strokeDasharray="6 14"
                         strokeLinecap="round"
                         animate={{ strokeDashoffset: [0, -40] }}
-                        transition={{ duration: 1.6, repeat: Infinity, ease: 'linear' }}
-                        opacity={0.75}
+                        transition={{ duration: 1.2, repeat: Infinity, ease: 'linear' }}
+                        opacity={0.85}
                       />
                     </g>
 
                     {/* Dynamic Smooth Traveling Node Marker */}
                     <motion.g
                       animate={{ x: activeX, y: activeY }}
-                      transition={{ type: 'spring', stiffness: 130, damping: 18, mass: 0.8 }}
+                      transition={{ type: 'spring', stiffness: 220, damping: 24, mass: 0.6 }}
                     >
                       {/* Outer concentric focal ring */}
-                      <circle r="18" fill="#0457F1" fillOpacity="0.12" stroke="#0457F1" strokeWidth="1.5" />
+                      <circle r="22" fill="#0457F1" fillOpacity="0.18" stroke="#0457F1" strokeWidth="2" />
+                      <circle r="12" fill="#0457F1" fillOpacity="0.3" />
                       {/* Core active dot */}
-                      <circle r="6.5" fill="#0457F1" />
-                      <circle r="2.5" fill="#FFFFFF" />
+                      <circle r="7" fill="#0457F1" />
+                      <circle r="3" fill="#FFFFFF" />
                     </motion.g>
 
                     {/* Milestone Target Nodes on the Curve */}
@@ -498,9 +552,115 @@ export default function GoLiveCurve() {
                 </div>
               </div>
             </div>
-          </div>
+
+            {/* Integrated Onboarding Drop-off & Solution (Direct Continuation) */}
+            <div className="pt-8 flex flex-col gap-6">
+              <div className="flex flex-col gap-1.5">
+                <span className="text-[12px] font-bold uppercase tracking-[0.14em] text-[#0457F1]">
+                  Frictionless Onboarding Engine
+                </span>
+                <h3 className="font-display text-xl font-bold tracking-tight text-[#0F172A] sm:text-2xl">
+                  Why merchants drop off & how SabbPe solves it
+                </h3>
+              </div>
+
+              <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                {REASONS.map((r, index) => (
+                  <motion.li
+                    key={r.why}
+                    initial={{ opacity: 0, y: 15 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, amount: 0.15 }}
+                    transition={{ duration: 0.45, delay: index * 0.08, ease: [0.16, 1, 0.3, 1] }}
+                    className="group flex flex-col justify-between rounded-2xl border border-slate-200/90 bg-[#F8FAFC]/80 p-5 shadow-2xs transition-all hover:border-[#0457F1]/40 hover:bg-white hover:shadow-xs"
+                  >
+                    <div>
+                      <span className="inline-block rounded-md bg-amber-50 px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider text-amber-700 border border-amber-200/60">
+                        Why merchants drop off
+                      </span>
+                      <h4 className="mt-2 text-[15px] font-bold text-[#0F172A]">{r.why}</h4>
+                      <p className="mt-1 text-[13px] leading-relaxed text-[#64748B]">{r.detail}</p>
+                    </div>
+
+                    <div className="mt-4 border-t border-slate-200/60 pt-3">
+                      <span className="inline-block rounded-md bg-blue-50 px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider text-[#0457F1] border border-blue-200/60">
+                        What SabbPe does
+                      </span>
+                      <p className="mt-1.5 text-[13.5px] font-medium leading-relaxed text-[#334155]">{r.fix}</p>
+                    </div>
+                  </motion.li>
+                ))}
+              </ul>
+
+              {/* Action Bar */}
+              <div className="flex flex-wrap items-center gap-3.5 pt-4 border-t border-slate-100">
+                <a
+                  href="https://onboarding.sabbpe.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={clsx(
+                    'inline-flex items-center gap-2 rounded-xl bg-[#0457F1] px-6 py-3.5 text-sm font-bold text-white shadow-[0_4px_16px_rgba(4,87,241,0.25)] transition-all hover:bg-[#0339A8] hover:shadow-[0_8px_24px_rgba(4,87,241,0.35)] active:scale-[0.98]',
+                    FOCUS,
+                  )}
+                >
+                  <span>Onboard now</span>
+                  <ArrowRight className="h-4 w-4" />
+                </a>
+                <button
+                  type="button"
+                  onClick={() => setVideoOpen(true)}
+                  className={clsx(
+                    'inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-6 py-3.5 text-sm font-bold text-[#0F172A] shadow-2xs hover:border-[#0457F1] hover:text-[#0457F1] hover:bg-slate-50 transition-all active:scale-[0.98]',
+                    FOCUS,
+                  )}
+                >
+                  <Play className="h-4 w-4 fill-[#0457F1] text-[#0457F1]" />
+                  <span>Watch how onboarding works</span>
+                </button>
+                <span className="text-[13.5px] font-medium text-[#64748B]">
+                  From the first hello to a signed agreement.
+                </span>
+              </div>
+            </div>
+          </motion.div>
         </div>
       </Wrap>
+
+      {/* Onboarding Video Modal */}
+      {videoOpen && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/75 p-4 backdrop-blur-sm"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Merchant onboarding video"
+          onClick={() => setVideoOpen(false)}
+        >
+          <div
+            className="w-full max-w-4xl overflow-hidden rounded-2xl border border-slate-800 bg-[#0B1220] shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-white/10 px-5 py-3.5">
+              <span className="text-sm font-bold text-white">Merchant Onboarding Walkthrough</span>
+              <button
+                type="button"
+                onClick={() => setVideoOpen(false)}
+                aria-label="Close video"
+                className={clsx('rounded-lg p-1.5 text-white/80 hover:bg-white/10 hover:text-white transition-colors', FOCUS)}
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <video
+              controls
+              autoPlay
+              playsInline
+              className="aspect-video w-full bg-black"
+            >
+              <source src="/videos/merchant_onboarding.mp4#t=1" type="video/mp4" />
+            </video>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

@@ -24,9 +24,9 @@ export default function WhyStatement() {
 
   return (
     <section className="border-y border-slate-200/60 bg-[#F8FAFC]">
-      <Wrap className="flex flex-col items-center gap-6 py-24 text-center sm:py-28">
+      <Wrap className="flex flex-col items-center gap-3.5 py-10 text-center sm:py-12">
         <Chip>Why SabbPe</Chip>
-        <p ref={ref} className="max-w-[880px] font-display text-[26px] font-bold leading-[1.25] tracking-[-0.015em] sm:text-[34px] lg:text-[40px]">
+        <p ref={ref} className="max-w-[880px] font-display text-[24px] font-bold leading-[1.3] tracking-[-0.015em] sm:text-[32px] lg:text-[38px]">
           {reduce
             ? <span className="text-[#0F172A]">{STATEMENT}</span>
             : words.map((word, index) => <Word key={`${word}-${index}`} text={word} progress={scrollYProgress} range={[index / words.length, (index + 1) / words.length]} />)}

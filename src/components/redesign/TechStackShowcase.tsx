@@ -19,8 +19,16 @@ import {
   Activity,
   Sparkles,
   CheckCircle2,
+  UserCheck,
 } from 'lucide-react';
 import { Chip, FOCUS, H2, Wrap } from './ui';
+
+const CORE_PILLARS = [
+  { icon: UserCheck, title: 'Onboarding' },
+  { icon: RefreshCw, title: 'Settlements' },
+  { icon: Layers, title: 'Reconciliation' },
+  { icon: Sparkles, title: 'Gift360 Engine' },
+];
 
 // Homepage video.
 // Set a Google Drive file ID to play that video in Drive's player. The file must be shared as
@@ -55,39 +63,68 @@ const ARCHITECTURE_FEATURES = [
   },
 ];
 
+const VIDEO_TOTAL_SECONDS = 40; // Exact length of tech_stack_video.mp4 (0:40)
+
 export default function TechStackShowcase() {
   const [isPlaying, setIsPlaying] = useState(true);
   const [isMuted, setIsMuted] = useState(true);
   const [videoError, setVideoError] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
+  const [duration, setDuration] = useState(VIDEO_TOTAL_SECONDS);
   const [isSeeking, setIsSeeking] = useState(false);
   const [activeStage, setActiveStage] = useState(0);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  // Auto-cycle through the 4 orchestration nodes for a smooth animated tech stack flow
+  // Sync duration and state on initial mount and check HTML5 video
   React.useEffect(() => {
-    const timer = setInterval(() => {
-      setActiveStage((prev) => (prev + 1) % 4);
-    }, 2800);
-    return () => clearInterval(timer);
+    if (videoRef.current) {
+      const vid = videoRef.current;
+      if (typeof vid.duration === 'number' && !isNaN(vid.duration) && isFinite(vid.duration) && vid.duration > 0) {
+        setDuration(vid.duration);
+      }
+    }
   }, []);
 
-  const formatTime = (timeInSeconds: number) => {
-    if (isNaN(timeInSeconds) || timeInSeconds < 0) return '0:00';
+  // Auto-cycle through the 4 orchestration nodes for a smooth animated tech stack flow
+  React.useEffect(() => {
+    if (!isPlaying) return;
+    const intervalMs = videoError ? 1000 : 2800;
+    const timer = setInterval(() => {
+      if (videoError) {
+        setCurrentTime((prev) => {
+          const next = prev + 1;
+          const maxDur = duration > 0 ? duration : VIDEO_TOTAL_SECONDS;
+          const clamped = next >= maxDur ? 0 : next;
+          setActiveStage(Math.min(3, Math.floor((clamped / maxDur) * 4)));
+          return clamped;
+        });
+      } else {
+        setActiveStage((prev) => (prev + 1) % 4);
+      }
+    }, intervalMs);
+    return () => clearInterval(timer);
+  }, [isPlaying, videoError, duration]);
+
+  const formatTime = (timeInSeconds: number, isTotalDuration = false) => {
+    if (isNaN(timeInSeconds) || !isFinite(timeInSeconds) || timeInSeconds <= 0) {
+      return isTotalDuration ? '0:40' : '0:00';
+    }
     const minutes = Math.floor(timeInSeconds / 60);
     const seconds = Math.floor(timeInSeconds % 60);
     return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
   };
 
   const togglePlay = () => {
-    if (!videoRef.current) return;
-    if (isPlaying) {
-      videoRef.current.pause();
-      setIsPlaying(false);
+    if (videoRef.current && !videoError) {
+      if (isPlaying) {
+        videoRef.current.pause();
+        setIsPlaying(false);
+      } else {
+        videoRef.current.play().catch(() => {});
+        setIsPlaying(true);
+      }
     } else {
-      videoRef.current.play().catch(() => {});
-      setIsPlaying(true);
+      setIsPlaying(!isPlaying);
     }
   };
 
@@ -104,35 +141,61 @@ export default function TechStackShowcase() {
     }
   };
 
+  const syncDuration = (vid: HTMLVideoElement) => {
+    if (typeof vid.duration === 'number' && !isNaN(vid.duration) && isFinite(vid.duration) && vid.duration > 0) {
+      setDuration(vid.duration);
+    }
+  };
+
   const handleTimeUpdate = () => {
     if (videoRef.current && !isSeeking) {
-      setCurrentTime(videoRef.current.currentTime);
+      const vid = videoRef.current;
+      if (typeof vid.currentTime === 'number' && !isNaN(vid.currentTime) && isFinite(vid.currentTime)) {
+        setCurrentTime(vid.currentTime);
+      }
+      syncDuration(vid);
     }
   };
 
   const handleLoadedMetadata = () => {
     if (videoRef.current) {
-      setDuration(videoRef.current.duration || 0);
+      syncDuration(videoRef.current);
     }
   };
+
+  const effectiveDuration = duration > 0 && isFinite(duration) ? duration : VIDEO_TOTAL_SECONDS;
 
   const handleSeekChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTime = parseFloat(e.target.value);
-    setCurrentTime(newTime);
-    if (videoRef.current) {
-      videoRef.current.currentTime = newTime;
+    if (!isNaN(newTime) && isFinite(newTime)) {
+      setCurrentTime(newTime);
+      if (videoRef.current && !videoError && isFinite(videoRef.current.duration) && videoRef.current.duration > 0) {
+        videoRef.current.currentTime = newTime;
+      } else {
+        setActiveStage(Math.min(3, Math.floor((newTime / effectiveDuration) * 4)));
+      }
     }
   };
 
+  const progressPercent = effectiveDuration > 0
+    ? Math.min(100, Math.max(0, (currentTime / effectiveDuration) * 100))
+    : 0;
+
   return (
-    <section className="relative overflow-hidden border-t border-slate-100 bg-gradient-to-b from-white via-[#F8FAFC] to-[#F1F5F9]/60 py-24 text-[#0F172A]">
+    <section className="relative overflow-hidden border-t border-slate-100 bg-gradient-to-b from-white via-[#F8FAFC] to-[#F1F5F9]/60 py-16 sm:py-24 text-[#0F172A]">
       {/* Background Decorative Glows */}
       <div className="pointer-events-none absolute -top-40 right-1/4 h-[550px] w-[550px] rounded-full bg-blue-100/40 blur-[100px]" aria-hidden="true" />
       <div className="pointer-events-none absolute bottom-0 left-10 h-[450px] w-[450px] rounded-full bg-sky-100/30 blur-[90px]" aria-hidden="true" />
 
-      <Wrap className="relative flex flex-col gap-14">
+      <Wrap className="relative flex flex-col gap-10">
         {/* Section Header */}
-        <div className="flex flex-col items-center gap-4 text-center">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+          className="flex flex-col items-center gap-4 text-center"
+        >
           <div className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50/80 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-[#0457F1] shadow-2xs backdrop-blur-xs">
             <Cpu className="h-3.5 w-3.5 text-[#0457F1]" />
             Architecture & Tech Stack
@@ -146,10 +209,38 @@ export default function TechStackShowcase() {
           <p className="max-w-[660px] text-base leading-relaxed text-[#475569]">
             Watch how SabbPe moves money across payment channels, orchestrates intelligent multi-bank routing, settles funds instantly, and activates Gift360 CRM loyalty.
           </p>
-        </div>
+
+          {/* Feature Pillars Strip: Onboarding, Settlements, Reconciliation, Gift360 Engine */}
+          <div className="mt-2 flex flex-wrap items-center justify-center gap-3 sm:gap-4">
+            {CORE_PILLARS.map((item, i) => {
+              const Icon = item.icon;
+              return (
+                <motion.div
+                  key={item.title}
+                  initial={{ opacity: 0, y: 10 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.2 }}
+                  transition={{ duration: 0.4, delay: 0.15 + i * 0.06 }}
+                  className="inline-flex items-center gap-2 rounded-xl border border-slate-200/90 bg-white px-4 py-2 text-[13.5px] font-semibold text-[#0F172A] shadow-2xs backdrop-blur-xs transition-all hover:border-blue-200 hover:shadow-xs"
+                >
+                  <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-blue-50 text-[#0457F1]">
+                    <Icon className="h-3.5 w-3.5" />
+                  </div>
+                  <span>{item.title}</span>
+                </motion.div>
+              );
+            })}
+          </div>
+        </motion.div>
 
         {/* Master Enterprise Dashboard Window Frame */}
-        <div className="relative mx-auto w-full max-w-[1080px] overflow-hidden rounded-3xl border border-slate-200/90 bg-white shadow-[0_25px_70px_-15px_rgba(15,23,42,0.12)]">
+        <motion.div
+          initial={{ opacity: 0, y: 25 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.15 }}
+          transition={{ duration: 0.6, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+          className="relative mx-auto w-full max-w-[1080px] overflow-hidden rounded-3xl border border-slate-200/90 bg-white shadow-[0_25px_70px_-15px_rgba(15,23,42,0.12)]"
+        >
           {/* macOS Style Window Title Bar */}
           <div className="flex items-center justify-between border-b border-slate-200/80 bg-[#F8FAFC] px-5 py-3.5 text-xs font-medium text-slate-500">
             {/* Window Controls (Red, Yellow, Green) */}
@@ -197,14 +288,16 @@ export default function TechStackShowcase() {
             ) : !videoError ? (
               <video
                 ref={videoRef}
-                src="/tech_stack_video.mp4"
-                poster="/hero-poster.jpg"
+                src="/tech_stack_video.mp4#t=1"
                 autoPlay
                 loop
                 muted={isMuted}
                 playsInline
+                preload="metadata"
                 onTimeUpdate={handleTimeUpdate}
                 onLoadedMetadata={handleLoadedMetadata}
+                onLoadedData={handleLoadedMetadata}
+                onCanPlay={handleLoadedMetadata}
                 onDurationChange={handleLoadedMetadata}
                 onPlay={() => setIsPlaying(true)}
                 onPause={() => setIsPlaying(false)}
@@ -405,7 +498,7 @@ export default function TechStackShowcase() {
                   <div
                     className="h-full rounded-full bg-gradient-to-r from-[#0457F1] to-[#38BDF8] shadow-[0_0_8px_rgba(56,189,248,0.6)]"
                     style={{
-                      width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%`,
+                      width: `${progressPercent}%`,
                     }}
                   />
                 </div>
@@ -413,13 +506,13 @@ export default function TechStackShowcase() {
                 <div
                   className="pointer-events-none absolute top-1/2 -translate-x-1/2 -translate-y-1/2 h-3.5 w-3.5 rounded-full bg-white shadow-[0_0_8px_rgba(4,87,241,0.9)] opacity-0 transition-opacity group-hover/timebar:opacity-100"
                   style={{
-                    left: `${duration > 0 ? (currentTime / duration) * 100 : 0}%`,
+                    left: `${progressPercent}%`,
                   }}
                 />
                 <input
                   type="range"
                   min={0}
-                  max={duration || 100}
+                  max={duration || 40}
                   step={0.1}
                   value={currentTime}
                   onChange={handleSeekChange}
@@ -448,7 +541,7 @@ export default function TechStackShowcase() {
                   <div className="flex items-center gap-1 rounded-md bg-white/10 px-2.5 py-0.5 font-mono text-[11px] font-semibold text-slate-200 shadow-inner">
                     <span className="text-cyan-300">{formatTime(currentTime)}</span>
                     <span className="text-slate-400">/</span>
-                    <span className="text-slate-300">{formatTime(duration)}</span>
+                    <span className="text-slate-300">{formatTime(effectiveDuration, true)}</span>
                   </div>
 
                   <div className="hidden items-center gap-2 text-xs font-medium text-slate-300 sm:flex">
@@ -478,15 +571,19 @@ export default function TechStackShowcase() {
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* 4 Feature Architecture Cards Under Dashboard */}
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {ARCHITECTURE_FEATURES.map((feat) => {
+          {ARCHITECTURE_FEATURES.map((feat, index) => {
             const Icon = feat.icon;
             return (
-              <div
+              <motion.div
                 key={feat.title}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.15 }}
+                transition={{ duration: 0.5, delay: index * 0.08, ease: [0.16, 1, 0.3, 1] }}
                 className="group relative flex flex-col justify-between rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs transition-all duration-300 hover:border-[#0457F1]/40 hover:shadow-md hover:-translate-y-1"
               >
                 <div>
@@ -510,7 +607,7 @@ export default function TechStackShowcase() {
                   <CheckCircle2 className="h-3.5 w-3.5" />
                   <span>Enterprise Grade</span>
                 </div>
-              </div>
+              </motion.div>
             );
           })}
         </div>

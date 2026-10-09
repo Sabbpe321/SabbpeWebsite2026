@@ -135,7 +135,7 @@ const SERVICE_CATEGORIES: ServiceCategory[] = [
       },
       {
         id: 'smartpay-qr',
-        name: 'Smartpay',
+        name: 'Smartpay QR',
         tagline: 'Dynamic counter codes & Soundbox integration',
         desc: 'Accept payments across GPay, PhonePe, Paytm, and any banking app with instant audio-visual confirmations and real-time merchant settlement.',
         videoSrc: '/videos/Smartpay.mp4',
@@ -157,6 +157,69 @@ const SERVICE_CATEGORIES: ServiceCategory[] = [
         desc: 'Disburse funds instantly to bank accounts, UPI VPAs, and cards using smart payout routing via IMPS, NEFT, RTGS, and UPI with real-time status webhooks.',
         videoSrc: '/videos/Payouts.mp4',
         icon: Send,
+      },
+    ],
+  },
+  {
+    id: 'settlement-reporting',
+    title: 'Settlement and reporting',
+    subtitle: 'T+0 and T+1 settlement with downloadable reports',
+    icon: FileCheck2,
+    color: '#0F766E',
+    features: [
+      {
+        id: 'settlement',
+        name: 'Automatic Settlement',
+        tagline: 'Automatic settlement on your timeline (T+0 / T+1)',
+        desc: 'Share your bank account once at onboarding and choose your settlement cycle. A SabbPe agent settles on schedule, and every settlement displays in real-time.',
+        videoSrc: '/videos/settlement.mp4',
+        posterSrc: '/videos/settlement.jpg',
+        icon: Zap,
+      },
+    ],
+  },
+  {
+    id: 'reconciliation',
+    title: 'Reconciliation',
+    subtitle: 'Payments matched to settlements automatically',
+    icon: FileCheck2,
+    color: '#2563EB',
+    features: [
+      {
+        id: 'reconciliation',
+        name: 'Auto Reconciliation',
+        tagline: 'Every record matched automatically by AI agent',
+        desc: 'Drop in your orders, gateway payments and bank settlements. An autonomous agent matches every record, flags discrepancies and lets you trace any ID across files.',
+        videoSrc: '/videos/reconciliation.mp4',
+        posterSrc: '/videos/reconciliation.jpg',
+        icon: FileCheck2,
+      },
+    ],
+  },
+  {
+    id: 'dashboard',
+    title: 'Dashboard and analytics',
+    subtitle: 'Collections, payouts and settlements in one view',
+    icon: Activity,
+    color: '#7C3AED',
+    features: [
+      {
+        id: 'merchant-dashboard',
+        name: 'Merchant Dashboard',
+        tagline: 'Unified command center to run your payments',
+        desc: 'For businesses that accept payments. Choose products, collect payments, track every transaction in real-time, and disburse payouts directly.',
+        videoSrc: '/videos/merchant_dashboard.mp4',
+        posterSrc: '/videos/merchant_dashboard.jpg',
+        icon: Activity,
+      },
+      {
+        id: 'distributor-dashboard',
+        name: 'Distributor Dashboard',
+        tagline: 'Onboard merchants, track approvals and see earnings',
+        desc: 'For channel partners who bring merchants to SabbPe. Onboard merchants, track approval milestones in real-time, and manage commission payouts.',
+        videoSrc: '/videos/distributor_dashboard.mp4',
+        posterSrc: '/videos/distributor_dashboard.jpg',
+        icon: Users,
       },
     ],
   },
@@ -201,81 +264,32 @@ const SERVICE_CATEGORIES: ServiceCategory[] = [
       },
     ],
   },
-  {
-    id: 'settlement-operations',
-    title: 'Settlement and operations',
-    subtitle: 'Settlement, reconciliation and dashboards',
-    icon: FileCheck2,
-    color: '#0F766E',
-    features: [
-      {
-        id: 'settlement',
-        name: 'Settlement',
-        tagline: 'Automatic settlement on your timeline',
-        desc: 'Share your bank account once at onboarding and choose T+0 or T+1. A SabbPe agent settles on schedule, and every settlement shows in your dashboard.',
-        videoSrc: '/videos/settlement.mp4',
-        posterSrc: '/videos/settlement.jpg',
-        icon: Zap,
-      },
-      {
-        id: 'reconciliation',
-        name: 'Reconciliation',
-        tagline: 'Every record matched by an agent',
-        desc: 'Drop in your orders, gateway payments and bank settlements. An agent matches every record, shows what is missing and lets you trace any ID.',
-        videoSrc: '/videos/reconciliation.mp4',
-        posterSrc: '/videos/reconciliation.jpg',
-        icon: FileCheck2,
-      },
-      {
-        id: 'merchant-dashboard',
-        name: 'Merchant Dashboard',
-        tagline: 'Run your payments from one place',
-        desc: 'For businesses that accept payments. Choose products, collect payments, track every transaction and send payouts.',
-        videoSrc: '/videos/merchant_dashboard.mp4',
-        posterSrc: '/videos/merchant_dashboard.jpg',
-        icon: Activity,
-      },
-      {
-        id: 'distributor-dashboard',
-        name: 'Distributor Dashboard',
-        tagline: 'Onboard merchants and track earnings',
-        desc: 'For partners who bring merchants to SabbPe. Onboard merchants, track their approval and see your earnings and settlements.',
-        videoSrc: '/videos/distributor_dashboard.mp4',
-        posterSrc: '/videos/distributor_dashboard.jpg',
-        icon: Users,
-      },
-    ],
-  },
 ];
 
 function resolveCategoryIndex(slug?: string): number {
   if (!slug) return 0;
   const clean = decodeURIComponent(slug).toLowerCase().trim().replace(/[-_]/g, ' ');
   
-  // 1. Direct ID / Title comparison
+  // 1. Direct category match or feature ID match
   for (let i = 0; i < SERVICE_CATEGORIES.length; i++) {
     const cat = SERVICE_CATEGORIES[i];
     const catId = cat.id.replace(/[-_]/g, ' ');
     const catTitle = cat.title.toLowerCase();
     if (clean === catId || clean === catTitle) return i;
+    if (cat.features.some((f) => f.id.replace(/[-_]/g, ' ') === clean || f.name.toLowerCase().includes(clean) || clean.includes(f.id))) {
+      return i;
+    }
   }
 
-  // 2. Exact keyword pattern matching
-  if (clean.includes('gift') || clean.includes('loyalty') || clean.includes('crm') || clean.includes('reward')) {
-    return 4;
-  }
-  if (clean.includes('disburse') || clean.includes('payout') || clean.includes('settlement') || clean.includes('assisted sol')) {
-    return 3;
-  }
-  if (clean.includes('upi') || clean.includes('qr') || clean.includes('assisted')) {
-    return 2;
-  }
-  if (clean.includes('collect') || clean.includes('recurring') || clean.includes('autopay') || clean.includes('mandate')) {
-    return 1;
-  }
-  if (clean.includes('online') || clean.includes('pay') || clean.includes('card')) {
-    return 0;
-  }
+  // 2. Keyword fallback matching
+  if (clean.includes('recon')) return 5;
+  if (clean.includes('dash') || clean.includes('analytic')) return 6;
+  if (clean.includes('settle') || clean.includes('report')) return 4;
+  if (clean.includes('gift') || clean.includes('loyalty') || clean.includes('crm') || clean.includes('reward')) return 7;
+  if (clean.includes('disburse') || clean.includes('payout')) return 3;
+  if (clean.includes('upi') || clean.includes('qr') || clean.includes('assisted') || clean.includes('deeplink')) return 2;
+  if (clean.includes('collect') || clean.includes('recurring') || clean.includes('autopay') || clean.includes('mandate')) return 1;
+  if (clean.includes('online') || clean.includes('pay') || clean.includes('card') || clean.includes('link') || clean.includes('split')) return 0;
 
   return 0;
 }
@@ -287,8 +301,15 @@ export default function ServicesVideoSuite({
   initialCategory?: string;
   initialFeature?: string;
 }) {
-  const [activeCategoryIndex, setActiveCategoryIndex] = useState(() => resolveCategoryIndex(initialCategory));
-  const [activeFeatureIndex, setActiveFeatureIndex] = useState(0);
+  const [activeCategoryIndex, setActiveCategoryIndex] = useState(() => resolveCategoryIndex(initialCategory || initialFeature));
+  const [activeFeatureIndex, setActiveFeatureIndex] = useState(() => {
+    const catIdx = resolveCategoryIndex(initialCategory || initialFeature);
+    const target = (initialFeature || initialCategory || '').toLowerCase().trim().replace(/[-_]/g, ' ');
+    const fIdx = SERVICE_CATEGORIES[catIdx]?.features.findIndex(
+      (f) => f.id.replace(/[-_]/g, ' ') === target || target.includes(f.id) || f.id.includes(target)
+    );
+    return fIdx !== -1 ? fIdx : 0;
+  });
   const [isPlaying, setIsPlaying] = useState(true);
   const [isMuted, setIsMuted] = useState(true);
   const [videoError, setVideoError] = useState(false);
@@ -305,17 +326,14 @@ export default function ServicesVideoSuite({
   };
 
   useEffect(() => {
-    if (initialCategory) {
-      const idx = resolveCategoryIndex(initialCategory);
+    if (initialCategory || initialFeature) {
+      const idx = resolveCategoryIndex(initialCategory || initialFeature);
       setActiveCategoryIndex(idx);
-      if (initialFeature) {
-        const fIdx = SERVICE_CATEGORIES[idx].features.findIndex(
-          (f) => f.id === initialFeature || f.id.includes(initialFeature)
-        );
-        setActiveFeatureIndex(fIdx !== -1 ? fIdx : 0);
-      } else {
-        setActiveFeatureIndex(0);
-      }
+      const target = (initialFeature || initialCategory || '').toLowerCase().trim().replace(/[-_]/g, ' ');
+      const fIdx = SERVICE_CATEGORIES[idx]?.features.findIndex(
+        (f) => f.id.replace(/[-_]/g, ' ') === target || target.includes(f.id) || f.id.includes(target)
+      );
+      setActiveFeatureIndex(fIdx !== -1 ? fIdx : 0);
     }
   }, [initialCategory, initialFeature]);
 
@@ -434,8 +452,8 @@ export default function ServicesVideoSuite({
           </p>
         </div>
 
-        {/* Main Service Category Cards */}
-        <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
+        {/* Main Service Category Cards - Spacious 4x2 Grid */}
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {SERVICE_CATEGORIES.map((cat, idx) => {
             const isSelected = idx === activeCategoryIndex;
             const Icon = cat.icon;
@@ -452,23 +470,14 @@ export default function ServicesVideoSuite({
                   }
                 }}
                 className={clsx(
-                  'group relative flex flex-col justify-between overflow-hidden rounded-2xl border p-5 text-left transition-all duration-300',
+                  'group relative flex flex-col justify-between overflow-hidden rounded-2xl border p-5 text-left transition-all duration-200 cursor-pointer',
                   FOCUS,
                   isSelected
-                    ? 'border-transparent shadow-[0_8px_30px_-5px_rgba(4,87,241,0.22)] scale-[1.02]'
-                    : 'border-slate-200/90 bg-white hover:border-[#0457F1]/50 hover:shadow-xs',
+                    ? 'border-[#0457F1] bg-gradient-to-b from-[#EFF6FF] via-[#DBEAFE]/20 to-white shadow-[0_4px_20px_rgba(4,87,241,0.15)] ring-2 ring-[#0457F1]/20 scale-[1.01]'
+                    : 'border-slate-200/90 bg-white hover:border-[#0457F1]/50 hover:bg-[#F8FAFC] shadow-2xs hover:shadow-xs',
                 )}
               >
-                {/* Active category background highlight */}
-                {isSelected && (
-                  <motion.div
-                    layoutId="active-service-category-highlight"
-                    className="absolute inset-0 rounded-2xl border-2 border-[#0457F1] bg-gradient-to-b from-[#EFF6FF] via-[#DBEAFE]/30 to-white"
-                    transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-                  />
-                )}
-
-                <div className="relative z-10 flex items-center justify-between mb-3">
+                <div className="flex items-center justify-between mb-3.5">
                   <div
                     className={clsx(
                       'flex h-10 w-10 items-center justify-center rounded-xl transition-colors',
@@ -487,16 +496,16 @@ export default function ServicesVideoSuite({
                   </span>
                 </div>
 
-                <div className="relative z-10">
+                <div>
                   <h3
                     className={clsx(
-                      'font-display text-[16px] font-bold leading-tight transition-colors',
+                      'font-display text-[16px] font-bold leading-snug transition-colors',
                       isSelected ? 'text-[#0457F1]' : 'text-[#0F172A]',
                     )}
                   >
                     {cat.title}
                   </h3>
-                  <p className="mt-1 text-xs text-slate-500 leading-snug line-clamp-2">
+                  <p className="mt-1.5 text-[12.5px] text-[#64748B] leading-relaxed">
                     {cat.subtitle}
                   </p>
                 </div>
@@ -506,12 +515,12 @@ export default function ServicesVideoSuite({
         </div>
 
         {/* Master Showcase: Sub-Feature Video Tabs + Continuous Looping Player */}
-        <div className="relative overflow-hidden rounded-3xl border border-slate-200/90 bg-white shadow-[0_20px_60px_-15px_rgba(15,23,42,0.1)] p-6 sm:p-9">
+        <div className="relative overflow-hidden rounded-3xl border border-slate-200/90 bg-white shadow-[0_20px_60px_-15px_rgba(15,23,42,0.1)] p-6 sm:p-10">
           {/* Sub-Feature Video Pills Selector */}
-          <div className="flex flex-wrap items-center justify-between gap-3 pb-6 border-b border-slate-100">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-400 mr-2">
-                Select Demo ({currentCategory.features.length}):
+          <div className="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-slate-100">
+            <div className="flex flex-wrap items-center gap-2.5">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-400 mr-1">
+                Select Feature Demo:
               </span>
               {currentCategory.features.map((feat, fIdx) => {
                 const isFeatureActive = fIdx === activeFeatureIndex;
@@ -523,7 +532,7 @@ export default function ServicesVideoSuite({
                     type="button"
                     onClick={() => setActiveFeatureIndex(fIdx)}
                     className={clsx(
-                      'group relative inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold transition-all duration-200',
+                      'group relative inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold transition-all duration-200 cursor-pointer',
                       FOCUS,
                       isFeatureActive
                         ? 'bg-[#0457F1] text-white shadow-[0_4px_14px_rgba(4,87,241,0.3)] scale-105'
@@ -546,17 +555,17 @@ export default function ServicesVideoSuite({
                   window.location.href = '/';
                 }
               }}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-[#F8FAFC] px-3 py-1.5 text-xs font-semibold text-slate-600 hover:border-[#0457F1] hover:bg-[#EFF6FF] hover:text-[#0457F1] transition-all"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-[#F8FAFC] px-3.5 py-2 text-xs font-semibold text-slate-600 hover:border-[#0457F1] hover:bg-[#EFF6FF] hover:text-[#0457F1] transition-all cursor-pointer"
             >
               <ArrowLeft className="h-3.5 w-3.5" />
               <span>Back</span>
             </button>
           </div>
 
-          {/* Main Content Layout: Video Player (Left/Top) + Feature Insights (Right/Bottom) */}
-          <div className="grid items-center gap-8 pt-6 lg:grid-cols-12">
+          {/* Main Content Layout: Video Player (Left 7 Cols) + Feature Insights (Right 5 Cols) */}
+          <div className="grid items-center gap-8 pt-8 lg:grid-cols-12">
             {/* Left: Video Player inside Enterprise Mock Frame */}
-            <div className="lg:col-span-8 overflow-hidden rounded-2xl border border-slate-200 bg-[#0A1120] shadow-md">
+            <div className="lg:col-span-7 overflow-hidden rounded-2xl border border-slate-200 bg-[#0A1120] shadow-md">
               {/* Frame Header Bar */}
               <div className="flex items-center justify-between border-b border-slate-800 bg-[#0E1726] px-4 py-2.5 text-xs text-slate-400">
                 <div className="flex items-center gap-1.5">
@@ -582,12 +591,13 @@ export default function ServicesVideoSuite({
                   <video
                     ref={videoRef}
                     key={currentFeature.videoSrc}
-                    src={currentFeature.videoSrc}
+                    src={`${currentFeature.videoSrc}#t=1`}
                     poster={currentFeature.posterSrc}
                     autoPlay
                     loop
                     muted={isMuted}
                     playsInline
+                    preload="metadata"
                     onTimeUpdate={handleTimeUpdate}
                     onLoadedMetadata={handleLoadedMetadata}
                     onDurationChange={handleLoadedMetadata}
@@ -732,8 +742,8 @@ export default function ServicesVideoSuite({
               </div>
             </div>
 
-            {/* Right: Feature Details & Integration Card */}
-            <div className="lg:col-span-4 flex flex-col gap-5">
+            {/* Right: Spacious Feature Details & Integration Card */}
+            <div className="lg:col-span-5 flex flex-col justify-between rounded-2xl border border-slate-200/90 bg-[#F8FAFC]/90 p-6 sm:p-7 shadow-xs">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={currentFeature.id}
@@ -744,51 +754,51 @@ export default function ServicesVideoSuite({
                   className="flex flex-col gap-4"
                 >
                   <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#0457F1]">
-                    <span className="flex h-2 w-2 rounded-full bg-[#0457F1]" />
+                    <span className="flex h-2.5 w-2.5 rounded-full bg-[#0457F1] ring-4 ring-blue-100" />
                     {currentCategory.title}
                   </div>
 
-                  <h3 className="font-display text-2xl font-bold text-[#0F172A]">
+                  <h3 className="font-display text-2xl font-bold tracking-tight text-[#0F172A] sm:text-3xl">
                     {currentFeature.name}
                   </h3>
 
-                  <p className="text-sm font-semibold text-[#0457F1]">
+                  <p className="text-[14px] font-semibold text-[#0457F1] leading-snug">
                     {currentFeature.tagline}
                   </p>
 
-                  <p className="text-sm leading-relaxed text-[#475569]">
+                  <p className="text-[14.5px] leading-relaxed text-[#475569]">
                     {currentFeature.desc}
                   </p>
 
                   {/* Feature Capabilities Checklist */}
-                  <div className="flex flex-col gap-2 rounded-xl border border-slate-100 bg-[#F8FAFC] p-4 text-xs text-slate-700">
-                    <div className="flex items-center gap-2 font-semibold text-[#0F172A]">
-                      <CheckCircle2 className="h-4 w-4 text-[#0457F1]" />
-                      <span>Instant REST API & SDK Integration</span>
+                  <div className="flex flex-col gap-2.5 rounded-xl border border-slate-200/80 bg-white p-4.5 text-xs text-slate-700 shadow-2xs mt-1">
+                    <div className="flex items-center gap-2.5 font-medium text-[#0F172A]">
+                      <CheckCircle2 className="h-4 w-4 text-[#0457F1] shrink-0" />
+                      <span>Instant REST API & Webhook Integration</span>
                     </div>
-                    <div className="flex items-center gap-2 font-semibold text-[#0F172A]">
-                      <CheckCircle2 className="h-4 w-4 text-[#0457F1]" />
-                      <span>Multi-Bank Smart Routing & Auto-Failover</span>
+                    <div className="flex items-center gap-2.5 font-medium text-[#0F172A]">
+                      <CheckCircle2 className="h-4 w-4 text-[#0457F1] shrink-0" />
+                      <span>Smart Multi-Bank Routing & Sub-Second Failover</span>
                     </div>
-                    <div className="flex items-center gap-2 font-semibold text-[#0F172A]">
-                      <CheckCircle2 className="h-4 w-4 text-[#0457F1]" />
-                      <span>Automated T+0 / T+1 Settlement & Recon</span>
+                    <div className="flex items-center gap-2.5 font-medium text-[#0F172A]">
+                      <CheckCircle2 className="h-4 w-4 text-[#0457F1] shrink-0" />
+                      <span>Automated T+0 / T+1 Settlement & Reconciliation</span>
                     </div>
                   </div>
 
                   {/* CTA Link */}
-                  <div className="pt-2">
+                  <div className="pt-3">
                     <a
                       href="https://onboarding.sabbpe.com"
                       target="_blank"
                       rel="noopener noreferrer"
                       className={clsx(
-                        'group inline-flex items-center gap-2 rounded-xl bg-[#0457F1] px-5 py-3 text-xs font-bold text-white shadow-[0_3px_12px_rgba(4,87,241,0.25)] transition-all hover:bg-[#0339A8]',
+                        'group inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#0457F1] px-6 py-3.5 text-sm font-bold text-white shadow-[0_4px_16px_rgba(4,87,241,0.25)] transition-all hover:bg-[#0339A8] hover:shadow-[0_8px_24px_rgba(4,87,241,0.35)] active:scale-[0.98]',
                         FOCUS,
                       )}
                     >
                       <span>Enable {currentFeature.name}</span>
-                      <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+                      <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                     </a>
                   </div>
                 </motion.div>

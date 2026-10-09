@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { animate, useInView, useReducedMotion } from 'framer-motion';
+import { animate, motion, useInView, useReducedMotion } from 'framer-motion';
 import { Wrap } from './ui';
 
 const STATS: { value: number | null; text: string; suffix: string; label: string }[] = [
@@ -33,9 +33,15 @@ function CountUp({ to, suffix }: { to: number; suffix: string }) {
 
 export default function StatsCard() {
   return (
-    <section className="bg-white pb-24 text-[#0F172A]">
+    <section className="bg-[#F8FAFC] py-10 sm:py-12 text-[#0F172A] border-t border-slate-100">
       <Wrap>
-        <div className="grid overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_10px_30px_rgba(15,23,42,0.04)] lg:grid-cols-[minmax(0,1fr)_minmax(0,1.5fr)]">
+        <motion.div
+          initial={{ opacity: 0, y: 25 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.15 }}
+          transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+          className="grid overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_10px_30px_rgba(15,23,42,0.04)] lg:grid-cols-[minmax(0,1fr)_minmax(0,1.5fr)]"
+        >
           <div className="flex flex-col gap-4 bg-gradient-to-br from-[#EFF6FF] via-[#F8FAFC] to-[#F1F5F9] p-8 lg:p-10 border-b lg:border-b-0 lg:border-r border-slate-200">
             <div className="font-display text-[28px] font-bold leading-tight text-[#0F172A]">
               Bank-grade payments for every business
@@ -54,8 +60,12 @@ export default function StatsCard() {
           </div>
           <div className="grid grid-cols-2 bg-white">
             {STATS.map((stat, index) => (
-              <div
+              <motion.div
                 key={stat.label}
+                initial={{ opacity: 0, y: 15 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.15 }}
+                transition={{ duration: 0.45, delay: index * 0.08, ease: [0.16, 1, 0.3, 1] }}
                 className={`border-slate-100 p-7 sm:p-8 ${index % 2 === 0 ? 'lg:border-l' : 'border-l'} ${index < 2 ? 'border-b' : ''} border-t lg:border-t-0`}
               >
                 <div className="font-display text-[40px] font-bold leading-none text-[#0457F1] sm:text-5xl">
@@ -66,10 +76,10 @@ export default function StatsCard() {
                   )}
                 </div>
                 <div className="mt-2.5 text-sm font-semibold text-[#64748B]">{stat.label}</div>
-              </div>
+              </motion.div>
             ))}
           </div>
-        </div>
+        </motion.div>
       </Wrap>
     </section>
   );

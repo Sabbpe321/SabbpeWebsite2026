@@ -91,14 +91,14 @@ const SERVICES_DATA = {
         {
           name: 'Reconciliation',
           desc: 'Payments matched to settlements automatically',
-          href: '/saas/reconciliation',
+          href: '/services/reconciliation',
           icon: RefreshCw,
           badge: null,
         },
         {
           name: 'Dashboard and analytics',
           desc: 'Collections, payouts and settlements in one view',
-          href: '/saas/dashboard',
+          href: '/services/dashboard',
           icon: LayoutDashboard,
           badge: null,
         },

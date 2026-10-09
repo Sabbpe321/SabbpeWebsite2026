@@ -1,60 +1,41 @@
 'use client';
 
-import { useState } from 'react';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import clsx from 'clsx';
 import { ArrowRight } from 'lucide-react';
 import DemoModal from '@/components/modals/DemoModal';
 import { FOCUS, Wrap } from './ui';
 
-const PRODUCTS = [
-  {
-    name: 'Collections',
-    kind: 'SabbPe',
-    line: 'Accept every way your customers pay, through one integration.',
-    points: ['UPI, cards, net banking and wallets', 'QR codes and payment links', 'UPI Autopay for recurring payments'],
-  },
-  {
-    name: 'Smart routing',
-    kind: 'SabbPe',
-    line: 'Each payment is sent to the gateway best placed to complete it.',
-    points: ['Multiple gateways behind one integration', 'Routing rules by success rate and cost', 'One dashboard across all gateways'],
-  },
-  {
-    name: 'Disbursements',
-    kind: 'SabbPe',
-    line: 'Pay vendors, partners and customers one at a time or in bulk.',
-    points: ['Bank transfer, IMPS and NEFT', 'Bulk payout files', 'Status for every transfer'],
-  },
-  {
-    name: 'Settlement',
-    kind: 'SabbPe',
-    line: 'Reconciled funds in your bank on your schedule.',
-    points: ['T+0 and T+1 settlement cycles', 'Automatic bank reconciliation', 'Reports ready for accounting'],
-  },
-  {
-    name: 'Gift360 CRM',
-    kind: 'Gift360',
-    line: 'Keep the customers you just got paid by.',
-    points: ['Customer profiles from payment data', 'Targeted campaigns by SMS and WhatsApp', 'Cashback, vouchers and rewards'],
-  },
-  {
-    name: 'Gift360 Loyalty',
-    kind: 'Gift360',
-    line: 'Branded gift cards and reward points in one click.',
-    points: ['Physical and digital gift cards', 'Points earned and spent across channels', '400+ third-party brand vouchers'],
-  },
+const PARTNER_BRANDS = [
+  { name: 'Yes Bank', logo: '/yes-bank.png' },
+  { name: 'NTT Data', logo: '/ntt-data.png' },
+  { name: 'Mswipe', logo: '/mswipe.png' },
+  { name: 'Innoviti', logo: '/innoviti.png' },
+  { name: 'ValueDesign', logo: '/valuedesign.png' },
+  { name: 'Augmont', logo: '/augmont.png' },
+  { name: 'Vi', logo: '/vi.png' },
+  { name: 'PAX', logo: '/pax.png' },
+  { name: 'Aisino', logo: '/aisino.png' },
+  { name: 'Google Workspace', logo: '/google-workspace.png' },
+  { name: 'NASSCOM', logo: '/nasscom.png' },
+  { name: 'IIM Lucknow', logo: '/iim-lucknow.png' },
 ];
 
 export default function Hero() {
-  const [active, setActive] = useState(0);
-  const product = PRODUCTS[active];
-
   return (
-    <section className="bg-gradient-to-b from-[#F0F7FF] via-[#F8FAFC] to-white text-[#0F172A]">
-      <Wrap className="flex flex-col items-center gap-7 pb-24 pt-36 text-center sm:pt-44">
+    <section className="relative flex min-h-screen sm:min-h-[100dvh] flex-col justify-center overflow-hidden bg-gradient-to-b from-[#F0F7FF] via-[#F8FAFC] to-white text-[#0F172A] pt-20 pb-10 sm:pt-24 sm:pb-12">
+      {/* Subtle background ambient light */}
+      <div className="pointer-events-none absolute -top-24 left-1/2 h-[450px] w-[700px] -translate-x-1/2 rounded-full bg-blue-100/50 blur-[120px]" aria-hidden="true" />
+
+      <Wrap className="relative my-auto flex flex-col items-center justify-center gap-5 text-center">
         {/* Recognition Badge */}
-        <div className="inline-flex flex-wrap items-center justify-center gap-x-4 gap-y-1 rounded-full border border-blue-200 bg-white/90 px-4 py-2 text-[13px] text-[#475569] shadow-sm backdrop-blur-sm">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+          className="inline-flex flex-wrap items-center justify-center gap-x-3.5 gap-y-1 rounded-full border border-blue-200/80 bg-white/90 px-4 py-1.5 text-[13px] text-[#475569] shadow-2xs backdrop-blur-sm"
+        >
           <span className="font-bold text-[#0457F1]">Recognised by</span>
           <span className="font-medium text-[#334155]">NASSCOM</span>
           <span className="text-slate-300">•</span>
@@ -63,34 +44,44 @@ export default function Hero() {
           <span className="font-medium text-[#334155]">Wadhwani</span>
           <span className="text-slate-300">•</span>
           <span className="font-medium text-[#334155]">DPIIT</span>
-        </div>
+        </motion.div>
 
         {/* Headline */}
         <motion.h1
-          initial={{ opacity: 0, y: 16 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-          className="max-w-[920px] font-display text-[40px] font-bold leading-[1.08] tracking-[-0.03em] text-[#0F172A] sm:text-[56px] lg:text-[68px]"
+          transition={{ duration: 0.6, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+          className="max-w-[920px] font-display text-[38px] font-bold leading-[1.08] tracking-[-0.03em] text-[#0F172A] sm:text-[54px] lg:text-[64px]"
         >
           Collect payments. Pay out.{' '}
-          <span className="bg-gradient-to-r from-[#0457F1] to-[#0284C7] bg-clip-text text-transparent">
+          <span className="bg-gradient-to-r from-[#0457F1] via-[#0284C7] to-[#00A3FF] bg-clip-text text-transparent">
             Bring customers back.
           </span>
         </motion.h1>
 
         {/* Subtitle */}
-        <p className="max-w-[680px] text-[17px] leading-relaxed text-[#475569] sm:text-lg">
-          SabbPe is the payment orchestration platform for collections and disbursements. Gift360 adds CRM and loyalty for the same merchants, switched on in one click.
-        </p>
+        <motion.p
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+          className="max-w-[680px] text-[16px] leading-relaxed text-[#475569] sm:text-[18px]"
+        >
+          SabbPe is the payment orchestration platform for collections and disbursements. Gift360 adds CRM and customer loyalty for the same merchants, switched on in one click.
+        </motion.p>
 
         {/* CTA Buttons */}
-        <div className="flex flex-wrap items-center justify-center gap-4">
+        <motion.div
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+          className="flex flex-wrap items-center justify-center gap-3.5 pt-1"
+        >
           <DemoModal
             trigger={
               <button
                 type="button"
                 className={clsx(
-                  'rounded-xl bg-[#0457F1] px-7 py-3.5 text-sm font-bold text-white shadow-[0_4px_14px_rgba(4,87,241,0.3)] transition-all hover:bg-[#0339A8]',
+                  'rounded-xl bg-[#0457F1] px-7 py-3.5 text-sm font-bold text-white shadow-[0_4px_16px_rgba(4,87,241,0.3)] transition-all hover:bg-[#0339A8] hover:shadow-[0_8px_24px_rgba(4,87,241,0.4)] active:scale-[0.98]',
                   FOCUS,
                 )}
               >
@@ -103,68 +94,58 @@ export default function Hero() {
             target="_blank"
             rel="noopener noreferrer"
             className={clsx(
-              'inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-7 py-3.5 text-sm font-bold text-[#0F172A] shadow-xs hover:border-[#0457F1] hover:text-[#0457F1] hover:bg-slate-50 transition-all',
+              'inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-7 py-3.5 text-sm font-bold text-[#0F172A] shadow-2xs hover:border-[#0457F1] hover:text-[#0457F1] hover:bg-slate-50 transition-all active:scale-[0.98]',
               FOCUS,
             )}
           >
             <span>Onboard</span>
             <ArrowRight className="h-4 w-4" />
           </a>
-        </div>
+        </motion.div>
 
-        {/* Product Showcase */}
-        <div className="mt-8 grid w-full gap-5 text-left lg:grid-cols-[minmax(0,1fr)_320px]">
-          {/* Active Product Details */}
-          <div className="min-h-[280px] rounded-2xl border border-slate-200 bg-white p-7 shadow-[0_10px_30px_rgba(15,23,42,0.05)] sm:p-8">
+        {/* Continuous Looping Brand Logos Marquee */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.55 }}
+          className="relative mt-8 w-full max-w-[1020px] overflow-hidden pt-2"
+        >
+          {/* Edge fade gradients */}
+          <div className="pointer-events-none absolute left-0 top-0 bottom-0 z-10 w-16 sm:w-24 bg-gradient-to-r from-[#F0F7FF] to-transparent" aria-hidden="true" />
+          <div className="pointer-events-none absolute right-0 top-0 bottom-0 z-10 w-16 sm:w-24 bg-gradient-to-l from-white to-transparent" aria-hidden="true" />
+
+          <div className="mb-3 text-[11px] font-bold uppercase tracking-[0.14em] text-slate-400">
+            Trusted Partners & Brands
+          </div>
+
+          <div className="flex w-full overflow-hidden py-1">
             <motion.div
-              key={product.name}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.25 }}
-              className="flex flex-col gap-3.5"
+              className="flex items-center gap-5 shrink-0"
+              animate={{ x: ['0%', '-50%'] }}
+              transition={{
+                duration: 26,
+                repeat: Infinity,
+                ease: 'linear',
+              }}
             >
-              <div className="inline-block w-max rounded-md bg-[#EFF6FF] px-2.5 py-1 text-[12px] font-bold uppercase tracking-wider text-[#0457F1]">
-                {product.kind}
-              </div>
-              <h3 className="font-display text-2xl font-bold text-[#0F172A] sm:text-3xl">
-                {product.name}
-              </h3>
-              <p className="text-[17px] leading-relaxed text-[#475569]">{product.line}</p>
-              <ul className="mt-2 flex flex-col gap-2.5 text-[15px] text-[#334155]">
-                {product.points.map((point) => (
-                  <li key={point} className="flex items-center gap-2.5">
-                    <span className="h-1.5 w-1.5 rounded-full bg-[#0457F1]" aria-hidden="true" />
-                    <span>{point}</span>
-                  </li>
-                ))}
-              </ul>
+              {[...PARTNER_BRANDS, ...PARTNER_BRANDS].map((brand, index) => (
+                <div
+                  key={`${brand.name}-${index}`}
+                  className="group flex h-12 min-w-[130px] items-center justify-center rounded-xl border border-slate-200/90 bg-white px-4 py-2 shadow-2xs backdrop-blur-xs transition-all hover:border-blue-300 hover:shadow-xs"
+                >
+                  <div className="relative h-7 w-24">
+                    <Image
+                      src={brand.logo}
+                      alt={brand.name}
+                      fill
+                      className="object-contain transition-transform duration-200 group-hover:scale-105"
+                    />
+                  </div>
+                </div>
+              ))}
             </motion.div>
           </div>
-
-          {/* Product Switcher Grid */}
-          <div className="flex flex-col gap-3.5 rounded-2xl border border-slate-200 bg-[#F8FAFC] p-5 text-[#0F172A] shadow-[0_10px_30px_rgba(15,23,42,0.03)]">
-            <div className="text-center text-[15px] font-bold text-[#0F172A]">Every rupee, in one place</div>
-            <div className="grid grid-cols-2 gap-2.5">
-              {PRODUCTS.map((item, index) => (
-                <button
-                  key={item.name}
-                  type="button"
-                  aria-pressed={index === active}
-                  onClick={() => setActive(index)}
-                  className={clsx(
-                    'min-h-[64px] rounded-lg border px-2.5 text-sm font-semibold transition-all',
-                    FOCUS,
-                    index === active
-                      ? 'border-[#0457F1] bg-[#0457F1] text-white shadow-sm'
-                      : 'border-slate-200 bg-white text-[#334155] hover:border-[#0457F1] hover:text-[#0457F1]',
-                  )}
-                >
-                  {item.name}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
+        </motion.div>
       </Wrap>
     </section>
   );

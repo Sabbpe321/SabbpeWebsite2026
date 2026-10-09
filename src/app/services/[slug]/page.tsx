@@ -25,23 +25,11 @@ export default async function ServiceSlugPage({ params }: { params: Promise<{ sl
   const { slug } = await params;
   const clean = decodeURIComponent(slug).toLowerCase().trim();
 
-  const isSaas = Boolean(SAAS_MODULES[clean] || clean === 'dashboard-and-analytics');
-  if (isSaas) {
-    return (
-      <div className="min-h-screen bg-white text-[#0F172A]">
-        <Navbar />
-        <SaasProductDetail slug={clean} />
-        <Footer />
-      </div>
-    );
-  }
-
-  // Otherwise render the video suite for the core payment services
   return (
     <div className="min-h-screen bg-white text-[#0F172A]">
       <Navbar />
-      <main className="pt-24 sm:pt-28">
-        <ServicesVideoSuite key={slug} initialCategory={slug} />
+      <main className="pt-20 sm:pt-24">
+        <ServicesVideoSuite key={clean} initialCategory={clean} initialFeature={clean} />
       </main>
       <Footer />
     </div>
